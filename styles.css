@@ -272,15 +272,17 @@ h2 {
 }
 
 /* ================================
-   FLOATING PHOTOS (IMPORTANT)
-================================ */
+/* ===== Floating Photo Styles (FIXED) ===== */
+
 #photo-layer {
     position: fixed;
     inset: 0;
-    z-index: 2; /* between background & container */
+    z-index: 2;
     pointer-events: none;
+    overflow: hidden; /* prevents visual edge sticking */
 }
 
+/* Moving photo shell */
 .floating-photo {
     position: fixed;
     width: 220px;
@@ -288,12 +290,28 @@ h2 {
     object-fit: cover;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    cursor: pointer;
     pointer-events: auto;
-    transform-style: preserve-3d;
-    transition: transform 0.6s ease;
+    cursor: pointer;
+
+    /* 🔑 CRITICAL FIX */
+    transition: none;               /* movement must NEVER be eased */
+    will-change: left, top;          /* smooth motion */
+    backface-visibility: hidden;
 }
 
+/* Flip animation ONLY */
 .floating-photo.flip {
-    transform: rotateY(180deg);
+    animation: photo-flip 0.6s ease forwards;
+}
+
+@keyframes photo-flip {
+    0% {
+        transform: rotateY(0deg);
+    }
+    50% {
+        transform: rotateY(90deg);
+    }
+    100% {
+        transform: rotateY(180deg);
+    }
 }
