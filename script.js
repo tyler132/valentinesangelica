@@ -240,3 +240,68 @@ function setupMusicPlayer() {
         }
     });
 } 
+/* ===== Floating Bouncing Photos ===== */
+
+const TOTAL_PHOTOS = 9; // 🔴 change only this if needed
+const PHOTOS = Array.from({ length: TOTAL_PHOTOS }, (_, i) => `img${i + 1}.JPEG`);
+
+const photoLayer = document.getElementById("photo-layer");
+const photos = [];
+const velocities = [];
+
+const PHOTO_SIZE = 220;
+const SPEED = 1.4;
+
+function randomVelocity() {
+    return (Math.random() > 0.5 ? 1 : -1) * (Math.random() * SPEED + 0.6);
+}
+
+function randomPhoto(exclude) {
+    let pick;
+    do {
+        pick = PHOTOS[Math.floor(Math.random() * PHOTOS.length)];
+    } while (pick === exclude && PHOTOS.length > 1);
+    return pick;
+}
+
+PHOTOS.forEach(src => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "floating-photo";
+
+    img.style.left = Math.random() * (window.innerWidth - PHOTO_SIZE) + "px";
+    img.style.top = Math.random() * (window.innerHeight - PHOTO_SIZE) + "px";
+
+    img.addEventListener("click", () => {
+        img.classList.add("flip");
+        setTimeout(() => {
+            img.src = randomPhoto(img.src);
+            img.classList.remove("flip");
+        }, 300);
+    });
+
+    photoLayer.appendChild(img);
+    photos.push(img);
+
+    velocities.push({
+        x: randomVelocity(),
+        y: randomVelocity()
+    });
+});
+
+function animatePhotos() {
+    photos.forEach((img, i) => {
+        let x = img.offsetLeft + velocities[i].x;
+        let y = img.offsetTop + velocities[i].y;
+
+        if (x <= 0 || x + PHOTO_SIZE >= window.innerWidth) velocities[i].x *= -1;
+        if (y <= 0 || y + PHOTO_SIZE >= window.innerHeight) velocities[i].y *= -1;
+
+        img.style.left = x + "px";
+        img.style.top = y + "px";
+    });
+
+    requestAnimationFrame(animatePhotos);
+}
+
+animatePhotos();
